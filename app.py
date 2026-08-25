@@ -40,10 +40,11 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
 
-    .narrative {
-        font-family: 'Instrument Serif', serif;
-        font-size: 1.5rem;
-        line-height: 1.5;
+        .narrative {
+        font-family: 'IBM Plex Sans', sans-serif !important;
+        font-weight: 400;
+        font-size: 1.3rem;
+        line-height: 1.6;
         color: #111111;
         margin: 2rem 0 2.5rem 0;
         padding-left: 1.2rem;
