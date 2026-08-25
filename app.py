@@ -40,7 +40,7 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
 
-        .narrative {
+    .narrative {
         font-family: 'IBM Plex Sans', sans-serif !important;
         font-weight: 400;
         font-size: 1.3rem;
@@ -99,6 +99,20 @@ st.markdown("""
 
     .block-container { padding-top: 2rem; padding-bottom: 3rem; }
     hr { border-color: #EAEAEA; }
+
+    /* --- Responsive mobile --- */
+    @media (max-width: 768px) {
+        h1, .stApp h1 { font-size: 1.9rem !important; }
+        .subtitle { font-size: 0.95rem; }
+        .narrative { font-size: 1.05rem; padding-left: 0.8rem; }
+        .block-container { padding-left: 1rem; padding-right: 1rem; }
+        div[data-testid="stPlotlyChart"] { padding: 0.5rem; }
+        [data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
