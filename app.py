@@ -43,9 +43,11 @@ store_types = st.sidebar.multiselect(
 date_min, date_max = full_data["date"].min(), full_data["date"].max()
 date_range = st.sidebar.date_input("Période", value=(date_min, date_max), min_value=date_min, max_value=date_max)
 
+full_data["date"] = pd.to_datetime(full_data["date"])
 filtered = full_data[full_data["type"].isin(store_types)]
 if len(date_range) == 2:
-    start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
+    start = pd.Timestamp(date_range[0])
+    end = pd.Timestamp(date_range[1])
     filtered = filtered[(filtered["date"] >= start) & (filtered["date"] <= end)]
 
 # --- KPIs en haut ---
