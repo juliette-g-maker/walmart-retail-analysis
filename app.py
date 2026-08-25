@@ -9,7 +9,7 @@ st.set_page_config(page_title="Walmart Retail Analysis", page_icon="📊", layou
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
 st.markdown("""
@@ -18,7 +18,7 @@ st.markdown("""
     .main { background-color: #FFFFFF; padding-top: 1rem; }
 
     h1, .stApp h1 {
-        font-family: 'Bricolage Grotesque', sans-serif !important;
+        font-family: 'Space Grotesk', sans-serif !important;
         color: #111111;
         font-weight: 700 !important;
         font-size: 3rem !important;
@@ -26,16 +26,17 @@ st.markdown("""
         line-height: 1.1;
     }
     h2, h3 {
-        font-family: 'Bricolage Grotesque', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif !important;
         color: #111111;
-        font-weight: 500;
+        font-weight: 600 !important;
     }
 
     .subtitle {
-        font-family: 'Instrument Serif', serif;
-        font-style: italic;
+        font-family: 'IBM Plex Sans', sans-serif !important;
+        font-style: normal;
         color: #555555;
-        font-size: 1.3rem;
+        font-size: 1.1rem;
+        font-weight: 400;
         margin-bottom: 1.5rem;
     }
 
@@ -62,12 +63,12 @@ st.markdown("""
         border-right: 1px solid #EAEAEA;
     }
     [data-testid="stSidebar"] h2 {
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: 'IBM Plex Mono', monospace !important;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: #888888;
-        font-weight: 500;
+        font-weight: 500 !important;
     }
 
     button[data-baseweb="tab"] {
@@ -103,7 +104,20 @@ st.markdown("""
 st.title("Analyse des ventes retail — Walmart")
 st.markdown("<p class='subtitle'>Exploration des ventes hebdomadaires de 45 magasins</p>", unsafe_allow_html=True)
 
-# Palette vive et distinguable, réservée aux graphiques uniquement
+# --- Traduction des mois en français ---
+MOIS_FR = {
+    "January": "janvier", "February": "février", "March": "mars", "April": "avril",
+    "May": "mai", "June": "juin", "July": "juillet", "August": "août",
+    "September": "septembre", "October": "octobre", "November": "novembre", "December": "décembre"
+}
+
+def date_fr(date, with_day=False):
+    pattern = "%d %B %Y" if with_day else "%B %Y"
+    formatted = date.strftime(pattern)
+    for en, fr in MOIS_FR.items():
+        formatted = formatted.replace(en, fr)
+    return formatted
+
 COLORS = {"A": "#E63946", "B": "#457B9D", "C": "#F4A261"}
 PLOTLY_LAYOUT = dict(
     plot_bgcolor="white",
@@ -125,7 +139,6 @@ def get_data():
 
 full_data = get_data()
 
-# --- Sidebar : filtres ---
 st.sidebar.header("Filtres")
 store_types = st.sidebar.multiselect(
     "Type de magasin",
@@ -140,12 +153,11 @@ if len(date_range) == 2:
     start, end = pd.Timestamp(date_range[0]), pd.Timestamp(date_range[1])
     filtered = filtered[(filtered["date"] >= start) & (filtered["date"] <= end)]
 
-# --- Résumé narratif (remplace les KPI cards) ---
 total_sales = filtered["weekly_sales"].sum()
 nb_stores = filtered["store"].nunique()
 avg_weekly = filtered["weekly_sales"].mean()
-period_start = filtered["date"].min().strftime("%B %Y")
-period_end = filtered["date"].max().strftime("%B %Y")
+period_start = date_fr(filtered["date"].min())
+period_end = date_fr(filtered["date"].max())
 
 st.markdown(
     f"<p class='narrative'>Entre {period_start} et {period_end}, les {nb_stores} magasins analysés ont généré "
@@ -154,7 +166,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# --- Onglets ---
 tab1, tab2, tab3 = st.tabs(["Évolution des ventes", "Saisonnalité & promotions", "Départements"])
 
 with tab1:
@@ -169,11 +180,10 @@ with tab1:
     fig1.update_traces(line=dict(width=2.5))
     st.plotly_chart(fig1, use_container_width=True)
 
-    # Insight calculé dynamiquement
     peak_row = weekly_by_type.loc[weekly_by_type["weekly_sales"].idxmax()]
     st.markdown(
         f"<p class='insight'>Le pic de ventes le plus élevé a été observé le "
-        f"{peak_row['date'].strftime('%d %B %Y')} pour les magasins de type {peak_row['type']}, "
+        f"{date_fr(peak_row['date'], with_day=True)} pour les magasins de type {peak_row['type']}, "
         f"coïncidant avec la période des fêtes de fin d'année.</p>",
         unsafe_allow_html=True
     )
