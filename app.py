@@ -7,19 +7,23 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Walmart Retail Analysis", page_icon="📊", layout="wide")
 
 st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
 
+st.markdown("""
+<style>
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #111111; }
     .main { background-color: #FFFFFF; padding-top: 1rem; }
 
-    /* Titre principal en Bricolage Grotesque */
-    h1 {
-        font-family: 'Bricolage Grotesque', sans-serif;
+    h1, .stApp h1 {
+        font-family: 'Bricolage Grotesque', sans-serif !important;
         color: #111111;
-        font-weight: 700;
-        font-size: 2.4rem;
-        letter-spacing: -0.02em;
+        font-weight: 700 !important;
+        font-size: 3rem !important;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
     }
     h2, h3 {
         font-family: 'Bricolage Grotesque', sans-serif;
@@ -27,7 +31,6 @@ st.markdown("""
         font-weight: 500;
     }
 
-    /* Sous-titre en Instrument Serif, italique */
     .subtitle {
         font-family: 'Instrument Serif', serif;
         font-style: italic;
@@ -49,7 +52,6 @@ st.markdown("""
         font-weight: 500;
     }
 
-    /* KPIs : bordure fine noire, chiffres en mono */
     [data-testid="stMetric"] {
         background-color: #FFFFFF;
         border: 1px solid #111111;
@@ -70,17 +72,23 @@ st.markdown("""
         letter-spacing: 0.05em;
     }
 
-    /* Onglets sobres, soulignement noir */
     button[data-baseweb="tab"] {
         font-family: 'Inter', sans-serif;
         font-weight: 500;
         font-size: 0.95rem;
-        color: #999999;
+        color: #999999 !important;
     }
-    button[data-baseweb="tab"][aria-selected="true"] { color: #111111; }
-    div[data-baseweb="tab-highlight"] { background-color: #111111; }
+    button[data-baseweb="tab"] p {
+        color: #999999 !important;
+        font-weight: 500 !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] p {
+        color: #111111 !important;
+        font-weight: 700 !important;
+    }
+    div[data-baseweb="tab-highlight"] { background-color: #111111 !important; }
+    div[data-baseweb="tab-border"] { background-color: #EAEAEA !important; }
 
-    /* Graphiques : cadre fin, pas d'ombre */
     div[data-testid="stPlotlyChart"] {
         background-color: #FFFFFF;
         border: 1px solid #EAEAEA;
@@ -205,3 +213,9 @@ with tab3:
 st.write("")
 with st.expander("Voir un extrait des données"):
     st.dataframe(filtered.head(10))
+
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown(
+    "<p style='text-align:center; font-family:IBM Plex Mono, monospace; font-size:0.8rem; color:#AAAAAA; margin-top:1rem;'>Analyse réalisée par Juliette Guyot — Août 2026</p>",
+    unsafe_allow_html=True
+)
