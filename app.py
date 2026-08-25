@@ -8,61 +8,101 @@ st.set_page_config(page_title="Walmart Retail Analysis", page_icon="📊", layou
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    .main { background-color: #FAFAFA; padding-top: 1rem; }
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; color: #111111; }
+    .main { background-color: #FFFFFF; padding-top: 1rem; }
 
-    h1 { color: #1F3864; font-weight: 700; font-size: 2.2rem; letter-spacing: -0.02em; }
-    h2, h3 { color: #1F3864; font-weight: 600; }
-    p, span, div { font-family: 'Inter', sans-serif; }
+    /* Titre principal en Bricolage Grotesque */
+    h1 {
+        font-family: 'Bricolage Grotesque', sans-serif;
+        color: #111111;
+        font-weight: 700;
+        font-size: 2.4rem;
+        letter-spacing: -0.02em;
+    }
+    h2, h3 {
+        font-family: 'Bricolage Grotesque', sans-serif;
+        color: #111111;
+        font-weight: 500;
+    }
 
-    [data-testid="stSidebar"] { background-color: #F5F5F3; }
-    [data-testid="stSidebar"] h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; color: #595959; }
+    /* Sous-titre en Instrument Serif, italique */
+    .subtitle {
+        font-family: 'Instrument Serif', serif;
+        font-style: italic;
+        color: #555555;
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+    }
 
-    /* Cartes KPI avec ombre légère */
+    [data-testid="stSidebar"] {
+        background-color: #FAFAFA;
+        border-right: 1px solid #EAEAEA;
+    }
+    [data-testid="stSidebar"] h2 {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #888888;
+        font-weight: 500;
+    }
+
+    /* KPIs : bordure fine noire, chiffres en mono */
     [data-testid="stMetric"] {
-        background-color: white;
-        border-radius: 12px;
+        background-color: #FFFFFF;
+        border: 1px solid #111111;
+        border-radius: 0px;
         padding: 1.2rem 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-        border: 1px solid #EEEEEE;
     }
-    [data-testid="stMetricValue"] { color: #1F3864; font-weight: 700; font-size: 1.6rem; }
-    [data-testid="stMetricLabel"] { color: #8A8A8A; font-size: 0.85rem; font-weight: 500; }
+    [data-testid="stMetricValue"] {
+        font-family: 'IBM Plex Mono', monospace;
+        color: #111111;
+        font-weight: 500;
+        font-size: 1.5rem;
+    }
+    [data-testid="stMetricLabel"] {
+        font-family: 'IBM Plex Mono', monospace;
+        color: #888888;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
 
-    /* Onglets plus espacés et sobres */
+    /* Onglets sobres, soulignement noir */
     button[data-baseweb="tab"] {
-        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
         font-size: 0.95rem;
-        color: #8A8A8A;
+        color: #999999;
     }
-    button[data-baseweb="tab"][aria-selected="true"] { color: #1F3864; }
-    div[data-baseweb="tab-highlight"] { background-color: #B08D57; }
+    button[data-baseweb="tab"][aria-selected="true"] { color: #111111; }
+    div[data-baseweb="tab-highlight"] { background-color: #111111; }
 
-    /* Conteneurs de graphiques avec carte */
+    /* Graphiques : cadre fin, pas d'ombre */
     div[data-testid="stPlotlyChart"] {
-        background-color: white;
-        border-radius: 12px;
+        background-color: #FFFFFF;
+        border: 1px solid #EAEAEA;
         padding: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-        border: 1px solid #EEEEEE;
     }
 
-    div[data-testid="stDataFrame"] { border-radius: 8px; overflow: hidden; }
+    div[data-testid="stDataFrame"] { font-family: 'IBM Plex Mono', monospace; }
 
     .block-container { padding-top: 2rem; padding-bottom: 3rem; }
+    hr { border-color: #EAEAEA; }
 </style>
 """, unsafe_allow_html=True)
 
 st.title("Analyse des ventes retail — Walmart")
-st.markdown("<p style='color:#8A8A8A; font-size:1.05rem; margin-bottom:2rem;'>Exploration des ventes hebdomadaires de 45 magasins, croisées avec la saisonnalité et des facteurs externes.</p>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Exploration des ventes hebdomadaires de 45 magasins</p>", unsafe_allow_html=True)
 
-COLORS = {"A": "#1F3864", "B": "#B08D57", "C": "#8FA8C4"}
+# Palette noir/blanc/gris, un seul accent
+COLORS = {"A": "#111111", "B": "#888888", "C": "#CCCCCC"}
 PLOTLY_LAYOUT = dict(
     plot_bgcolor="white",
     paper_bgcolor="white",
-    font=dict(family="Inter, sans-serif", color="#262626", size=13),
+    font=dict(family="IBM Plex Mono, monospace", color="#111111", size=12),
     margin=dict(l=10, r=10, t=20, b=10),
 )
 
@@ -101,7 +141,7 @@ col2.metric("Ventes moy. / semaine", f"${filtered['weekly_sales'].mean():,.0f}")
 col3.metric("Magasins", f"{filtered['store'].nunique()}")
 col4.metric("Lignes analysées", f"{len(filtered):,}")
 
-st.write("")  # espacement
+st.write("")
 
 # --- Onglets ---
 tab1, tab2, tab3 = st.tabs(["Évolution des ventes", "Saisonnalité & promotions", "Départements"])
@@ -115,7 +155,7 @@ with tab1:
         labels={"weekly_sales": "Ventes ($)", "date": "", "type": "Type"}
     )
     fig1.update_layout(**PLOTLY_LAYOUT, hovermode="x unified")
-    fig1.update_traces(line=dict(width=2.5))
+    fig1.update_traces(line=dict(width=2))
     st.plotly_chart(fig1, use_container_width=True)
 
 with tab2:
@@ -130,7 +170,7 @@ with tab2:
             pivot["% augmentation"] = ((pivot[True] - pivot[False]) / pivot[False] * 100).round(1)
             fig2 = go.Figure(go.Bar(
                 x=pivot.index, y=pivot["% augmentation"],
-                marker_color=[COLORS.get(t, "#1F3864") for t in pivot.index],
+                marker_color=[COLORS.get(t, "#111111") for t in pivot.index],
                 text=pivot["% augmentation"].astype(str) + "%",
                 textposition="outside"
             ))
@@ -143,7 +183,7 @@ with tab2:
         promo_effect["has_promo"] = promo_effect["has_promo"].map({True: "Avec promo", False: "Sans promo"})
         fig3 = go.Figure(go.Bar(
             x=promo_effect["has_promo"], y=promo_effect["weekly_sales"],
-            marker_color=["#8FA8C4", "#B08D57"],
+            marker_color=["#CCCCCC", "#111111"],
             text=promo_effect["weekly_sales"].round(0),
             textposition="outside"
         ))
@@ -157,7 +197,7 @@ with tab3:
     fig4 = px.bar(
         top_depts.sort_values("weekly_sales"), x="weekly_sales", y="dept", orientation="h",
         labels={"weekly_sales": "Ventes cumulées ($)", "dept": "Département"},
-        color_discrete_sequence=["#1F3864"]
+        color_discrete_sequence=["#111111"]
     )
     fig4.update_layout(**PLOTLY_LAYOUT)
     st.plotly_chart(fig4, use_container_width=True)
