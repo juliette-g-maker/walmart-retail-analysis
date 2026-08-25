@@ -27,7 +27,8 @@ def get_data():
     stores, features, sales = load_data()
     sales_clean = sales[sales["weekly_sales"] > 0]
     sales_merged = sales_clean.merge(stores, on="store", how="left")
-    full_data = sales_merged.merge(features, on=["store", "date"], how="left")
+    features_light = features.drop(columns=["isholiday"])  # évite le doublon avec sales
+    full_data = sales_merged.merge(features_light, on=["store", "date"], how="left")
     full_data["has_promo"] = full_data["markdown1"].notna()
     return full_data
 
