@@ -36,7 +36,25 @@ st.markdown("""
         font-style: italic;
         color: #555555;
         font-size: 1.3rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .narrative {
+        font-family: 'Instrument Serif', serif;
+        font-size: 1.5rem;
+        line-height: 1.5;
+        color: #111111;
+        margin: 2rem 0 2.5rem 0;
+        padding-left: 1.2rem;
+        border-left: 3px solid #111111;
+    }
+
+    .insight {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        color: #666666;
+        margin-top: 0.8rem;
+        line-height: 1.5;
     }
 
     [data-testid="stSidebar"] {
@@ -50,26 +68,6 @@ st.markdown("""
         letter-spacing: 0.08em;
         color: #888888;
         font-weight: 500;
-    }
-
-    [data-testid="stMetric"] {
-        background-color: #FFFFFF;
-        border: 1px solid #111111;
-        border-radius: 0px;
-        padding: 1.2rem 1.5rem;
-    }
-    [data-testid="stMetricValue"] {
-        font-family: 'IBM Plex Mono', monospace;
-        color: #111111;
-        font-weight: 500;
-        font-size: 1.5rem;
-    }
-    [data-testid="stMetricLabel"] {
-        font-family: 'IBM Plex Mono', monospace;
-        color: #888888;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
     }
 
     button[data-baseweb="tab"] {
@@ -105,8 +103,8 @@ st.markdown("""
 st.title("Analyse des ventes retail — Walmart")
 st.markdown("<p class='subtitle'>Exploration des ventes hebdomadaires de 45 magasins</p>", unsafe_allow_html=True)
 
-# Palette noir/blanc/gris, un seul accent
-COLORS = {"A": "#111111", "B": "#888888", "C": "#CCCCCC"}
+# Palette vive et distinguable, réservée aux graphiques uniquement
+COLORS = {"A": "#E63946", "B": "#457B9D", "C": "#F4A261"}
 PLOTLY_LAYOUT = dict(
     plot_bgcolor="white",
     paper_bgcolor="white",
@@ -142,14 +140,19 @@ if len(date_range) == 2:
     start, end = pd.Timestamp(date_range[0]), pd.Timestamp(date_range[1])
     filtered = filtered[(filtered["date"] >= start) & (filtered["date"] <= end)]
 
-# --- KPIs ---
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Ventes totales", f"${filtered['weekly_sales'].sum():,.0f}")
-col2.metric("Ventes moy. / semaine", f"${filtered['weekly_sales'].mean():,.0f}")
-col3.metric("Magasins", f"{filtered['store'].nunique()}")
-col4.metric("Lignes analysées", f"{len(filtered):,}")
+# --- Résumé narratif (remplace les KPI cards) ---
+total_sales = filtered["weekly_sales"].sum()
+nb_stores = filtered["store"].nunique()
+avg_weekly = filtered["weekly_sales"].mean()
+period_start = filtered["date"].min().strftime("%B %Y")
+period_end = filtered["date"].max().strftime("%B %Y")
 
-st.write("")
+st.markdown(
+    f"<p class='narrative'>Entre {period_start} et {period_end}, les {nb_stores} magasins analysés ont généré "
+    f"<strong>${total_sales:,.0f}</strong> de chiffre d'affaires cumulé, soit une moyenne de "
+    f"<strong>${avg_weekly:,.0f}</strong> par semaine et par magasin.</p>",
+    unsafe_allow_html=True
+)
 
 # --- Onglets ---
 tab1, tab2, tab3 = st.tabs(["Évolution des ventes", "Saisonnalité & promotions", "Départements"])
@@ -163,8 +166,17 @@ with tab1:
         labels={"weekly_sales": "Ventes ($)", "date": "", "type": "Type"}
     )
     fig1.update_layout(**PLOTLY_LAYOUT, hovermode="x unified")
-    fig1.update_traces(line=dict(width=2))
+    fig1.update_traces(line=dict(width=2.5))
     st.plotly_chart(fig1, use_container_width=True)
+
+    # Insight calculé dynamiquement
+    peak_row = weekly_by_type.loc[weekly_by_type["weekly_sales"].idxmax()]
+    st.markdown(
+        f"<p class='insight'>Le pic de ventes le plus élevé a été observé le "
+        f"{peak_row['date'].strftime('%d %B %Y')} pour les magasins de type {peak_row['type']}, "
+        f"coïncidant avec la période des fêtes de fin d'année.</p>",
+        unsafe_allow_html=True
+    )
 
 with tab2:
     st.write("")
@@ -185,18 +197,35 @@ with tab2:
             fig2.update_layout(**PLOTLY_LAYOUT, yaxis_title="% d'augmentation", xaxis_title="")
             st.plotly_chart(fig2, use_container_width=True)
 
+            most_sensitive = pivot["% augmentation"].idxmax()
+            st.markdown(
+                f"<p class='insight'>Les magasins de type {most_sensitive} sont proportionnellement "
+                f"les plus sensibles aux périodes de fêtes (+{pivot['% augmentation'].max()}%).</p>",
+                unsafe_allow_html=True
+            )
+
     with col_b:
         st.markdown("**Effet des promotions**")
         promo_effect = filtered.groupby("has_promo")["weekly_sales"].mean().reset_index()
         promo_effect["has_promo"] = promo_effect["has_promo"].map({True: "Avec promo", False: "Sans promo"})
         fig3 = go.Figure(go.Bar(
             x=promo_effect["has_promo"], y=promo_effect["weekly_sales"],
-            marker_color=["#CCCCCC", "#111111"],
+            marker_color=["#A8DADC", "#1D3557"],
             text=promo_effect["weekly_sales"].round(0),
             textposition="outside"
         ))
         fig3.update_layout(**PLOTLY_LAYOUT, yaxis_title="Ventes moyennes ($)", xaxis_title="")
         st.plotly_chart(fig3, use_container_width=True)
+
+        if len(promo_effect) == 2:
+            pct_diff = ((promo_effect.loc[promo_effect["has_promo"] == "Avec promo", "weekly_sales"].values[0] -
+                         promo_effect.loc[promo_effect["has_promo"] == "Sans promo", "weekly_sales"].values[0]) /
+                        promo_effect.loc[promo_effect["has_promo"] == "Sans promo", "weekly_sales"].values[0] * 100)
+            st.markdown(
+                f"<p class='insight'>Les promotions ont un effet mesurable mais modéré sur les ventes "
+                f"({pct_diff:+.1f}%), nettement plus faible que l'effet saisonnier.</p>",
+                unsafe_allow_html=True
+            )
 
 with tab3:
     st.write("")
@@ -205,10 +234,18 @@ with tab3:
     fig4 = px.bar(
         top_depts.sort_values("weekly_sales"), x="weekly_sales", y="dept", orientation="h",
         labels={"weekly_sales": "Ventes cumulées ($)", "dept": "Département"},
-        color_discrete_sequence=["#111111"]
+        color="weekly_sales",
+        color_continuous_scale=["#F4A261", "#E63946"]
     )
-    fig4.update_layout(**PLOTLY_LAYOUT)
+    fig4.update_layout(**PLOTLY_LAYOUT, coloraxis_showscale=False)
     st.plotly_chart(fig4, use_container_width=True)
+
+    top3_share = (top_depts.nlargest(3, "weekly_sales")["weekly_sales"].sum() / top_depts["weekly_sales"].sum() * 100)
+    st.markdown(
+        f"<p class='insight'>Les 3 départements les plus performants concentrent {top3_share:.0f}% "
+        f"du chiffre d'affaires du top 10 — une forte concentration typique de la loi de Pareto en retail.</p>",
+        unsafe_allow_html=True
+    )
 
 st.write("")
 with st.expander("Voir un extrait des données"):
