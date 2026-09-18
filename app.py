@@ -140,6 +140,7 @@ PLOTLY_LAYOUT = dict(
     font=dict(family="IBM Plex Mono, monospace", color="#111111", size=12),
     margin=dict(l=10, r=10, t=20, b=10),
 )
+PLOTLY_CONFIG = {"displayModeBar": False, "scrollZoom": False}
 
 @st.cache_data
 def get_data():
@@ -193,7 +194,7 @@ with tab1:
     )
     fig1.update_layout(**PLOTLY_LAYOUT, hovermode="x unified")
     fig1.update_traces(line=dict(width=2.5))
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, use_container_width=True, config=PLOTLY_CONFIG)
 
     peak_row = weekly_by_type.loc[weekly_by_type["weekly_sales"].idxmax()]
     st.markdown(
@@ -220,7 +221,7 @@ with tab2:
                 textposition="outside"
             ))
             fig2.update_layout(**PLOTLY_LAYOUT, yaxis_title="% d'augmentation", xaxis_title="")
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, use_container_width=True, config=PLOTLY_CONFIG)
 
             most_sensitive = pivot["% augmentation"].idxmax()
             st.markdown(
@@ -240,7 +241,7 @@ with tab2:
             textposition="outside"
         ))
         fig3.update_layout(**PLOTLY_LAYOUT, yaxis_title="Ventes moyennes ($)", xaxis_title="")
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, use_container_width=True, config=PLOTLY_CONFIG)
 
         if len(promo_effect) == 2:
             pct_diff = ((promo_effect.loc[promo_effect["has_promo"] == "Avec promo", "weekly_sales"].values[0] -
@@ -263,7 +264,7 @@ with tab3:
         color_continuous_scale=["#F4A261", "#E63946"]
     )
     fig4.update_layout(**PLOTLY_LAYOUT, coloraxis_showscale=False)
-    st.plotly_chart(fig4, use_container_width=True)
+    st.plotly_chart(fig4, use_container_width=True, config=PLOTLY_CONFIG)
 
     top3_share = (top_depts.nlargest(3, "weekly_sales")["weekly_sales"].sum() / top_depts["weekly_sales"].sum() * 100)
     st.markdown(
