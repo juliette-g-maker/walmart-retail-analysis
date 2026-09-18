@@ -139,6 +139,7 @@ PLOTLY_LAYOUT = dict(
     paper_bgcolor="white",
     font=dict(family="IBM Plex Mono, monospace", color="#111111", size=12),
     margin=dict(l=10, r=10, t=20, b=10),
+    dragmode=False,
 )
 PLOTLY_CONFIG = {"displayModeBar": False, "scrollZoom": False}
 
